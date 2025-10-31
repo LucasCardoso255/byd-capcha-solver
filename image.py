@@ -6,30 +6,43 @@ def get_x_y(img):
     altura, largura, _ = img.shape
 
     
-    first_white_pixelY = None
-    last_white_pixelY = None
-    first_white_pixelX = None
-    last_white_pixelX = None
-    # Itera sobre todos os pixels
-    for y in range(int(altura * 0.6)):
+    minY = maxY = minX = maxX = None
+    found_white = False
+    
+    # itera sobre todos os pixels
+    for y in range(int(altura)):
+        found_line = False
         for x in range(largura):
-            # Se o pixel for branco (BGR)
+            # se o pixel for branco
             if (img[y, x] == [255, 255, 255]).all():
-                if first_white_pixelY is None:
-                    first_white_pixelY = y
-                last_white_pixelY = y
-                if first_white_pixelX is None:
-                    first_white_pixelX = x
-                last_white_pixelX = x
-                img[y, x] = [255, 0, 0]
+                # marca que encontrou branco
+                found_white = True
+                found_line = True
+                
+                # atualiza limites
+                if minY is None or y < minY: minY = y
+                if maxY is None or y > maxY: maxY = y
+                if minX is None or x < minX: minX = x
+                if maxX is None or x > maxX: maxX = x
+                
+                 # pintar de AZUL os pixels brancos encontrados
+                img[y, x] = [255, 0, 0]  # azul em BGR
+        # se não encontrou branco na linha atual, mas já encontrou antes, acabou o bloco
+        if not found_line and found_white:
+            break
+                
+                
+    # # teste
+    # if minX is not None and maxX is not None and minY is not None and maxY is not None:
+    #     cv2.rectangle(img, (minX, minY), (maxX, maxY), (0, 255, 0), 1)
 
-    # Pintar o MEIO de VERMELHO forte
-    if first_white_pixelY is not None and last_white_pixelY is not None:
-        midY = (first_white_pixelY + last_white_pixelY) // 2
-        midX = (first_white_pixelX + last_white_pixelX) // 2
-        midX = int(midX)
-        img[midY, midX] = [0, 0, 255]  # vermelho em BGR
-        return midX, midY
+    # pintar o MEIO de VERMELHO
+    if minY is not None and maxY is not None:
+        midY = (minY + maxY) // 2
+        midX = (minX + maxX) // 2
+        testX = minX
+        img[midY, testX] = [0, 0, 255] 
+        return testX, midY
     return None, None
         
 
@@ -44,10 +57,12 @@ def get_base64(image_src):
         base64 = image_src.split(",", 1)[1]
         return base64
 
-def get_image_x(image_src):
+def get_image_x_y(image_src, debug=False):
     img = base64_to_matrix(get_base64(image_src))
     x, y = get_x_y(img)
-    # Salva a imagem modificada
-    cv2.imwrite("saida.png", img)
+    # salva a imagem pra debuggar
+    if debug:
+        cv2.imwrite("saida.png", img)
     print("Resultado:", x, y)
-    return x
+    _, largura, _ = img.shape
+    return x, largura
