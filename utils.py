@@ -46,7 +46,7 @@ def get_elements(by, value, timeout=30, element=DRIVER):
         print(f"{Fore.RED}Erro ao localizar o elemento: {value} - {str(e)}")
         raise e
 
-# função para aguardar o loading desparecer antes de prosseguir
+# aguarda o loading desparecer antes de prosseguir
 def wait_loading_to_disappear():
     try:
         WebDriverWait(DRIVER, timeout=30).until(
@@ -54,3 +54,26 @@ def wait_loading_to_disappear():
         )
     except:
         pass  # se não desaparecer em timeout, continua
+
+# função caso o loading tenha animação de fade
+def click_when_ready(by, value, timeout=30):
+    '''
+    Se puder evitar usar essa função, é melhor.
+    Pois não fica muito facil de entender qual elemento está buscando, ao usar ela.
+    (sem falar que eu fiz essa função para um caso especifico do modal de busca de vendedor, as outras funções substituem essa facilmente)
+    '''
+    try:
+        # aguarda invisibilidade de qualquer loading overlay
+        WebDriverWait(DRIVER, timeout).until(
+            EC.invisibility_of_element_located((By.CSS_SELECTOR, ".el-loading-mask"))
+        )
+        # espera o botão ficar clicável
+        button = WebDriverWait(DRIVER, timeout).until(
+            EC.element_to_be_clickable((by, value))
+        )
+        sleep(1.2)  # tempo de espera
+        button.click()
+        return button
+    except Exception as e:
+        print(f"{Fore.RED}Erro ao clicar no botão {value}: {e}")
+        raise e

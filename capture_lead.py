@@ -1,9 +1,11 @@
 from colorama import Fore
-from utils import Condition, get_element, get_elements, wait_loading_to_disappear
+from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from time import sleep
 
 lead_data = []
+USERNAME_GLOBAL = None
 
 def capture_leads():
     LEADBUTTON = get_element(Condition.CLICKABLE, By.XPATH, '/html/body/div[1]/div[2]/div/div/div/div[1]/div[1]/div/div/div[2]/div[1]/div')
@@ -42,6 +44,8 @@ def get_data(coluna3: WebElement):
         a.click()
         print(f'{Fore.YELLOW}Lendo dados do lead...')
         append_data()
+        append_vendor()
+
     else:
         print(f'{Fore.RED}Elemento "a" não encontrado')
 
@@ -76,4 +80,42 @@ def append_data():
 
     except Exception as e:
         print(f"Erro ao capturar o lead: {e}")
-   
+
+def append_vendor():
+    ASSIGNMENT_BUTTON = get_element(
+        Condition.CLICKABLE,
+        By.XPATH,
+        "//button[span[text()=' Lead Assignment ']]"
+    )
+
+    ASSIGNMENT_BUTTON.click()
+    print(f'{Fore.YELLOW}Atribuindo vendedor...')
+
+    wait_loading_to_disappear()
+
+    # # input_name = get_element(
+    # #     Condition.PRESENCE,
+    # #     By.CSS_SELECTOR,
+    # #     "div.el-input > input.el-input__inner"
+    # # )
+
+    input_wrapper = click_when_ready(By.XPATH, "/html/body/div[6]/div/div[2]/div/div[2]/div[1]/div/form/div/div/div[1]/div/div") # caixa de pesquisa de vendedor
+
+    input_name = input_wrapper.find_element(By.TAG_NAME, "input")
+    input_name.send_keys(USERNAME_GLOBAL)
+
+    QUERY_BUTTON = get_element(Condition.CLICKABLE, By.XPATH, "//div[contains(@class,'query-button')]//button[contains(@class,'el-button--primary')]//span[normalize-space(text())='Query']/..")
+    DRIVER.execute_script("arguments[0].click();", QUERY_BUTTON)
+
+    wait_loading_to_disappear()
+
+    assign_vendor_tbody = get_element(Condition.PRESENCE, By.XPATH, "//table[contains(@class, 'el-table__body')]//tbody")
+    VENDOR_SELECT_BUTTON = assign_vendor_tbody.get_elements(By.CSS_SELECTOR, 'input.el-radio__original')
+    
+    click_when_ready(VENDOR_SELECT_BUTTON)
+        
+
+
+
+
+        # QUERY_BUTTON = get_element(Condition.CLICKABLE, By.XPATH, "/html/body/div[4]/div/div[2]/div/div[2]/div[1]/div/form/div/div/div[3]")

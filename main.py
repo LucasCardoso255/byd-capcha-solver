@@ -28,13 +28,14 @@ init(autoreset=True)
 # args = parser.parse_args()
 
 
-json_path = os.path.join("json", "login.json")
+json_path = r'D:\.bundas\captcha2\byd-capcha-solver\json\login.json'
 
 # abre e carrega os dados
 with open(json_path, "r", encoding="utf-8") as f:
     login_data = json.load(f)
 
 USERNAME = login_data["username"]
+cl.USERNAME_GLOBAL = USERNAME
 PASSWORD = login_data["password"]
 
 LOGIN="https://uscrm.byd.com/login"
@@ -121,9 +122,6 @@ def resolve_captcha(x_pixel, image_width, image_element):
 
     offset_x = x_pixel - (slider_width // 2)  # centraliza o clique no meio do slider
     print(f"{Fore.MAGENTA}Calculando deslocamento do slider: {Fore.RED}{offset_x}{Fore.MAGENTA} pixels")
-    
-    
-    
     
     # movimenta o slider
     action = ActionChains(utils.DRIVER)
