@@ -23,7 +23,7 @@ options.binary_location = r"C:\Program Files\Mozilla Firefox\firefox.exe"
 DRIVER = webdriver.Firefox(service=Service(DRIVER_PATH), options=options)
     
 # espera por {cond} e pega o elemento
-def get_element(cond, by, value, timeout=30, element=DRIVER):
+def get_element(cond, by, value, timeout=90, element=DRIVER):
     try:
         TIMEOUT=timeout
         if cond == Condition.CLICKABLE:
@@ -37,7 +37,7 @@ def get_element(cond, by, value, timeout=30, element=DRIVER):
         raise e
     
 # aguarda o carregamento dos elementos antes de pegar
-def get_elements(by, value, timeout=30, element=DRIVER):
+def get_elements(by, value, timeout=90, element=DRIVER):
     try:
         TIMEOUT=timeout
         return WebDriverWait(element, TIMEOUT).until(EC.presence_of_all_elements_located((by, value)))
@@ -49,14 +49,14 @@ def get_elements(by, value, timeout=30, element=DRIVER):
 # aguarda o loading desparecer antes de prosseguir
 def wait_loading_to_disappear():
     try:
-        WebDriverWait(DRIVER, timeout=30).until(
+        WebDriverWait(DRIVER, timeout=90).until(
             EC.invisibility_of_element_located((By.CLASS_NAME, "el-loading-mask"))
         )
     except:
         pass  # se não desaparecer em timeout, continua
 
 # função caso o loading tenha animação de fade
-def click_when_ready(by, value, timeout=30):
+def click_when_ready(by, value, timeout=90):
     '''
     Se puder evitar usar essa função, é melhor.
     Pois não fica muito facil de entender qual elemento está buscando, ao usar ela.

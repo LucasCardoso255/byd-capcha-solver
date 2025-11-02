@@ -16,6 +16,8 @@ def capture_leads():
 # função de busca de leads pendentes
 def verify_lead():
 
+    increase_page_size()
+
     # achando o tbody da lista de leads
     TBODY = get_element(Condition.PRESENCE, By.XPATH, '/html/body/div[1]/div[1]/div[1]/div/div/div[2]/div[1]/div[2]/div[2]/div[4]/div[2]/table/tbody') 
     print(f'{Fore.GREEN}TBODY encontrado')
@@ -32,6 +34,14 @@ def verify_lead():
             coluna3 = colunas[2] # pegando a terceira coluna, que contém o link com os dados do lead
             print(f'{Fore.BLUE}Lead pendente de captura encontrado')
             get_data(coluna3)
+
+def increase_page_size():
+    PAGE_SIZE_DROPDOWN = get_element(Condition.CLICKABLE, By.XPATH, '/html/body/div[1]/div[1]/div[1]/div/div/div[2]/div[1]/div[2]/div[3]/div/span[2]/div/div[1]/input')
+    PAGE_SIZE_DROPDOWN.click()
+    print(f'{Fore.YELLOW}Aumentando tamanho da página para 100 itens...')
+
+    OPTION_100 = get_element(Condition.CLICKABLE, By.XPATH, '/html/body/div[3]/div[1]/div[1]/ul/li[4]')
+    OPTION_100.click()
 
 def get_data(coluna3: WebElement):
     
@@ -91,32 +101,37 @@ def append_vendor():
     print(f'{Fore.YELLOW}Atribuindo vendedor...')
 
     wait_loading_to_disappear()
-
-    # # input_name = get_element(
-    # #     Condition.PRESENCE,
-    # #     By.CSS_SELECTOR,
-    # #     "div.el-input > input.el-input__inner"
-    # # )
-
     input_wrapper = click_when_ready(By.XPATH, "/html/body/div[6]/div/div[2]/div/div[2]/div[1]/div/form/div/div/div[1]/div/div") # caixa de pesquisa de vendedor
 
     input_name = input_wrapper.find_element(By.TAG_NAME, "input")
     input_name.send_keys(USERNAME_GLOBAL)
+    print(f'{Fore.YELLOW}Procurando vendedor: {USERNAME_GLOBAL}...')
+    BUTTONS = get_elements(By.TAG_NAME, "button")
+    
+    queryButtons = [btn for btn in BUTTONS if btn.text.strip().lower() == "query"]
+    
+    if not queryButtons:
+        print(f'{Fore.RED}Botão de consulta não encontrado')
+        return
+    else:
+        print(f'{Fore.GREEN}{len(queryButtons)} botões de consulta encontrados:')
+        print(f'{Fore.GREEN}{[btn for btn in queryButtons]}')
 
-    input_name.send_keys(Keys.TAB + Keys.TAB + Keys.ENTER)
-
-    QUERY_BUTTON = get_element(Condition.PRESENCE, By.XPATH, "/html/body/div[4]/div/div[2]/div/div[2]/div[1]/div/form/div/div/div[3]/button[1]")
+    QUERY_BUTTON = queryButtons[-1]  # seleciona o último botão "Query"
     QUERY_BUTTON.click()
+    print(f'{Fore.YELLOW}Clicando no botão de consulta...')
 
-    wait_loading_to_disappear()
 
     assign_vendor_tbody = get_element(Condition.PRESENCE, By.XPATH, "//table[contains(@class, 'el-table__body')]//tbody")
     VENDOR_SELECT_BUTTON = assign_vendor_tbody.get_elements(By.CSS_SELECTOR, 'input.el-radio__original')
     
     click_when_ready(VENDOR_SELECT_BUTTON)
-        
+    
+    tabs_sequence = Keys.TAB * 11
+    input_name.send_keys(tabs_sequence + Keys.SPACE)
 
+    FINISH_ASSIGN = get_element(Condition.CLICKABLE,By.XPATH, '/html/body/div[12]/div/div[3]/div/button[2]')
+    FINISH_ASSIGN.click()
+        # tabs: 8
+        # e depois: 4
 
-
-
-        # QUERY_BUTTON = get_element(Condition.CLICKABLE, By.XPATH, "/html/body/div[4]/div/div[2]/div/div[2]/div[1]/div/form/div/div/div[3]")

@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import base64
 
+import requests
+
 def get_x_y(img):
     altura, largura, _ = img.shape
 
@@ -45,19 +47,38 @@ def get_x_y(img):
         return testX, midY
     return None, None
         
-
 def base64_to_matrix(base64_str):
     img_data = base64.b64decode(base64_str)
     np_arr = np.frombuffer(img_data, np.uint8)
     img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
     return img
    
-
+def url_to_base64(url: str) -> str:
+    """
+    Faz download da imagem de uma URL e retorna uma string base64 no formato data:image/...;base64,XXXX
+    """
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()  # lança erro se status != 200
+        content_type = response.headers.get("Content-Type", "image/png")  # tenta descobrir o tipo da imagem
+        base64_str = base64.b64encode(response.content).decode("utf-8")
+        return f"data:{content_type};base64,{base64_str}"
+    except Exception as e:
+        print(f"Erro ao converter URL para base64: {e}")
+        return None
+    
 def get_base64(image_src):
+        print("Base64 completa:", image_src)
         base64 = image_src.split(",")[1]
         return base64
 
 def get_image_x_y(image_src, debug=False):
+    
+    if image_src.startswith("http"):
+        print("Convertendo URL para base64...")
+        image_src = url_to_base64(image_src)
+        if image_src is None:
+            return None, None
     img = base64_to_matrix(get_base64(image_src))
     x, y = get_x_y(img)
     # salva a imagem pra debuggar
