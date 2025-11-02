@@ -1,3 +1,5 @@
+import json
+import os
 from colorama import Fore
 from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER
 from selenium.webdriver.common.by import By
@@ -12,6 +14,16 @@ def capture_leads():
     LEADBUTTON.click()
     print(f'{Fore.YELLOW}Acessando página de leads...')
     verify_lead()
+    json_write_data()
+
+def json_write_data():
+    os.makedirs("json", exist_ok=True)
+    caminho_arquivo = os.path.join("json", "leads.json")
+    
+    with open(caminho_arquivo, "w", encoding="utf-8") as f:
+        json.dump(lead_data, f, ensure_ascii=False, indent=4)
+
+    print(f"{Fore.GREEN}Arquivo salvo em: {caminho_arquivo}")
 
 # função de busca de leads pendentes
 def verify_lead():
