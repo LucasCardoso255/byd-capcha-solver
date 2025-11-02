@@ -2,7 +2,7 @@ from colorama import Fore
 from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from time import sleep
+from selenium.webdriver.common.keys import Keys
 
 lead_data = []
 USERNAME_GLOBAL = None
@@ -32,7 +32,6 @@ def verify_lead():
             coluna3 = colunas[2] # pegando a terceira coluna, que contém o link com os dados do lead
             print(f'{Fore.BLUE}Lead pendente de captura encontrado')
             get_data(coluna3)
-
 
 def get_data(coluna3: WebElement):
     
@@ -104,8 +103,10 @@ def append_vendor():
     input_name = input_wrapper.find_element(By.TAG_NAME, "input")
     input_name.send_keys(USERNAME_GLOBAL)
 
-    QUERY_BUTTON = get_element(Condition.CLICKABLE, By.XPATH, "//div[contains(@class,'query-button')]//button[contains(@class,'el-button--primary')]//span[normalize-space(text())='Query']/..")
-    DRIVER.execute_script("arguments[0].click();", QUERY_BUTTON)
+    input_name.send_keys(Keys.TAB + Keys.TAB + Keys.ENTER)
+
+    QUERY_BUTTON = get_element(Condition.PRESENCE, By.XPATH, "/html/body/div[4]/div/div[2]/div/div[2]/div[1]/div/form/div/div/div[3]/button[1]")
+    QUERY_BUTTON.click()
 
     wait_loading_to_disappear()
 

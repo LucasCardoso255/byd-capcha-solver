@@ -54,7 +54,7 @@ def base64_to_matrix(base64_str):
    
 
 def get_base64(image_src):
-        base64 = image_src.split(",", 1)[1]
+        base64 = image_src.split(",")[1]
         return base64
 
 def get_image_x_y(image_src, debug=False):
