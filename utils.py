@@ -20,7 +20,7 @@ class Condition(enum.Enum):
     PRESENCE = "presence"
     NO_WAIT = "no_wait"
 
-DRIVER_PATH = r"D:\.bundas\captcha2\byd-capcha-solver\Driver\webdriver.exe"
+DRIVER_PATH = r"C:\.CODE\byd crawler\byd-capcha-solver\Driver\webdriver.exe"
 options = Options()
 options.binary_location = r"C:\Program Files\Mozilla Firefox\firefox.exe"
 DRIVER = webdriver.Firefox(service=Service(DRIVER_PATH), options=options)

@@ -86,6 +86,10 @@ def append_data():
         nome = elemento_nome.text
         print(f'{Fore.BLUE}Nome do lead encontrado: {nome}')
 
+        elemento_telefone = get_element(Condition.PRESENCE, By.CSS_SELECTOR, 'div.use-base-info-item:nth-child(2) > div:nth-child(2) > span:nth-child(2)')
+        telefone = elemento_telefone.text
+        print(f'{Fore.BLUE}Telefone do lead encontrado: {telefone}')
+
         elemento_email = get_element(Condition.PRESENCE, By.CSS_SELECTOR, '.base-info-content span:nth-of-type(2)' )
         email = elemento_email.text
         print(f'{Fore.BLUE}Email do lead encontrado: {email}')
@@ -101,6 +105,7 @@ def append_data():
 
         _lead_data.append({
             "nome": nome,
+            "telefone": telefone,
             "email": email,
             "produto": produto,
             "observacoes": observacoes
@@ -173,3 +178,4 @@ def contact_assign():
     print(f'{Fore.BLUE}Atribuindo atendimento...')
     SAVE_BUTTON = get_last_element_by_content(By.TAG_NAME, 'button', 'Save')
     SAVE_BUTTON.click()
+    print(f'{Fore.GREEN}Lead atendido com sucesso')
