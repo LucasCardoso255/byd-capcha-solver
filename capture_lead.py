@@ -1,7 +1,7 @@
 import json
 import os
 from colorama import Fore
-from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER, get_last_element_by_content, wait_until_clickable
+from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER, get_last_element_by_content, wait_until_clickable, refresh_page
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.keys import Keys
@@ -11,11 +11,15 @@ _lead_data = []
 USERNAME_GLOBAL = None
 
 def capture_leads():
+    
     LEADBUTTON = get_element(Condition.CLICKABLE, By.XPATH, '/html/body/div[1]/div[2]/div/div/div/div[1]/div[1]/div/div/div[2]/div[1]/div')
     LEADBUTTON.click()
+    
     print(f'{Fore.YELLOW}Acessando página de leads...')
-    verify_lead()
-    json_write_data()
+    
+    while verify_lead() == True:
+        refresh_page()
+        json_write_data()
 
 def json_write_data():
     os.makedirs("json", exist_ok=True)
@@ -47,6 +51,8 @@ def verify_lead():
             coluna3 = colunas[2] # pegando a terceira coluna, que contém o link com os dados do lead
             print(f'{Fore.BLUE}Lead pendente de captura encontrado')
             get_data(coluna3)
+            return True
+    return False
 
 def increase_page_size():
     PAGE_SIZE_DROPDOWN = get_element(Condition.CLICKABLE, By.XPATH, '/html/body/div[1]/div[1]/div[1]/div/div/div[2]/div[1]/div[2]/div[3]/div/span[2]/div/div[1]/input')
@@ -66,7 +72,7 @@ def get_data(coluna3: WebElement):
         a.click()
         print(f'{Fore.YELLOW}Lendo dados do lead...')
         append_data()
-        #append_vendor()
+        append_vendor()
         contact_assign()
 
     else:
@@ -164,6 +170,6 @@ def contact_assign():
     CONTACT_TEXT.click()
     CONTACT_TEXT.send_keys("Contato Realizado.")
 
-    print(f'{Fore.BLUE}Atribuindo vendedor...')
+    print(f'{Fore.BLUE}Atribuindo atendimento...')
     SAVE_BUTTON = get_last_element_by_content(By.TAG_NAME, 'button', 'Save')
     SAVE_BUTTON.click()

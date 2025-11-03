@@ -1,24 +1,11 @@
-import enum
-import math
 import capture_lead as cl
 import utils
 from time import sleep
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.firefox.options import Options
 from colorama import Fore, init
-
-
 import image
-import os
 import json
-import re
-from urllib.parse import urlparse
 
 # colorama
 init(autoreset=True)
@@ -47,15 +34,6 @@ print(f"{Fore.YELLOW}Iniciando o navegador...")
 utils.DRIVER.maximize_window()
 utils.DRIVER.get(LOGIN)
 print(f"{Fore.GREEN}Navegador iniciado e página Inicial Carregada!")
-
-def refresh_page():
-    print(f"{Fore.YELLOW}Atualizando a página...")
-    utils.DRIVER.refresh()
-    wait_page_ready()
-
-def wait_page_ready():
-    WebDriverWait(utils.DRIVER, 30).until(lambda driver: driver.execute_script("return document.readyState") == "complete")
-
 
 def login(username, password):
     print(f"{Fore.YELLOW}Iniciando o processo de login...")

@@ -144,3 +144,11 @@ def wait_until_clickable(element, timeout=20, check_interval=0.3):
     raise TimeoutException(
         f"O elemento <{element.tag_name}> permaneceu obstruído após {timeout}s."
     )
+
+def refresh_page():
+    print(f"{Fore.YELLOW}Atualizando a página...")
+    DRIVER.refresh()
+    wait_page_ready()
+
+def wait_page_ready():
+    WebDriverWait(DRIVER, 30).until(lambda driver: driver.execute_script("return document.readyState") == "complete")
