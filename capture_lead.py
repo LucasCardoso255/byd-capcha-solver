@@ -1,13 +1,13 @@
 import json
 import os
-from time import sleep
 from colorama import Fore
-from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER
+from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER, get_last_element_by_content, wait_until_clickable
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
-lead_data = []
+_lead_data = []
 USERNAME_GLOBAL = None
 
 def capture_leads():
@@ -22,7 +22,7 @@ def json_write_data():
     caminho_arquivo = os.path.join("json", "leads.json")
     
     with open(caminho_arquivo, "w", encoding="utf-8") as f:
-        json.dump(lead_data, f, ensure_ascii=False, indent=4)
+        json.dump(_lead_data, f, ensure_ascii=False, indent=4)
 
     print(f"{Fore.GREEN}Arquivo salvo em: {caminho_arquivo}")
 
@@ -66,7 +66,8 @@ def get_data(coluna3: WebElement):
         a.click()
         print(f'{Fore.YELLOW}Lendo dados do lead...')
         append_data()
-        append_vendor()
+        #append_vendor()
+        contact_assign()
 
     else:
         print(f'{Fore.RED}Elemento "a" não encontrado')
@@ -92,7 +93,7 @@ def append_data():
         observacoes = [s.text for s in spans]
         print(f'{Fore.BLUE}Observações preenchidas: {observacoes}')
 
-        lead_data.append({
+        _lead_data.append({
             "nome": nome,
             "email": email,
             "produto": produto,
@@ -114,50 +115,55 @@ def append_vendor():
     print(f'{Fore.YELLOW}Atribuindo vendedor...')
 
     wait_loading_to_disappear()
-        
+    
     input_wrapper = click_when_ready(By.XPATH, "/html/body/div[6]/div/div[2]/div/div[2]/div[1]/div/form/div/div/div[1]/div/div") # caixa de pesquisa de vendedor
 
     input_name = input_wrapper.find_element(By.TAG_NAME, "input")
     input_name.send_keys(USERNAME_GLOBAL)
     print(f'{Fore.YELLOW}Procurando vendedor: {USERNAME_GLOBAL}...')
 
-    BUTTONS = get_elements(By.TAG_NAME, "button")
-    
-    queryButtons = [btn for btn in BUTTONS if btn.text.strip().lower() == "query"]
-    
-    if not queryButtons:
-        print(f'{Fore.RED}Botão de consulta não encontrado')
-        return
-    else:
-        print(f'{Fore.GREEN}{len(queryButtons)} botões de consulta encontrados:')
-        print(f'{Fore.GREEN}{[btn for btn in queryButtons]}')
-
-    QUERY_BUTTON = queryButtons[-1]  # seleciona o último botão "Query"
+    QUERY_BUTTON = get_last_element_by_content(By.TAG_NAME, "button", "Query")
     QUERY_BUTTON.click()
+    print(f'{Fore.YELLOW}Carregando consulta...')
+
+    wait_loading_to_disappear()
+    tBody = get_element(Condition.PRESENCE, By.XPATH, "/html/body/div[6]/div/div[2]/div/div[2]/div[2]/div[2]/div[4]/div[2]/table/tbody")
+    first_row = get_elements(By.TAG_NAME, "tr", element=tBody)[0]
+    first_col = get_elements(By.TAG_NAME, "td", element=first_row)[0]
+    radio_label = get_elements(By.TAG_NAME, "label", element=first_col)[0]
+    wait_until_clickable(radio_label)
+    radio_label.click()
+    print(f'{Fore.YELLOW}Vendedor selecionado.')
+
+    CONFIRM_BUTTON = get_last_element_by_content(By.TAG_NAME, "button", "Assignment")
+    CONFIRM_BUTTON.click()
+    print(f'{Fore.GREEN}Vendedor atribuído com sucesso.')
+
+def contact_assign():
+    print(f'{Fore.BLUE}Iniciando atribuição de vendedor.')
+
+    fu_record = get_element(Condition.CLICKABLE, By.XPATH, '//*[@id="tab-followRecords"]')
+    wait_until_clickable(fu_record)
+    fu_record.click()
+
+    ADD_TRACK = get_last_element_by_content(By.TAG_NAME, 'button', 'Add Track')
+    ActionChains(DRIVER).move_to_element(ADD_TRACK).click_and_hold().perform()
+    ActionChains(DRIVER).release().perform()
     
-    print(f'{Fore.YELLOW}Clicando no botão de consulta...')
+    ZAP = get_element(Condition.CLICKABLE, By.XPATH, '/html/body/ul/li[4]')
+    wait_until_clickable(ZAP)
+    ZAP.click()
+    
+    EVENT_TIME = get_element(Condition.CLICKABLE, By.CSS_SELECTOR, "input.el-input__inner[placeholder='Event Time']")
+    EVENT_TIME.click()
 
-    wait_loading_to_disappear()
-    tabs_sequence = Keys.TAB * 11
-    input_name.send_keys(tabs_sequence + Keys.SPACE)
+    EVENT_TIME_OK_BUTTON = get_element(Condition.CLICKABLE, By.XPATH, "//button[span[normalize-space()='OK']]")
+    EVENT_TIME_OK_BUTTON.click()
 
-    sleep(1)
+    CONTACT_TEXT = get_element(Condition.PRESENCE, By.CSS_SELECTOR, "textarea.el-textarea__inner[placeholder='Content']")
+    CONTACT_TEXT.click()
+    CONTACT_TEXT.send_keys("Contato Realizado.")
 
-    assignmentButtons = [btn for btn in BUTTONS if btn.text.strip().lower() == "assignment"]
-
-    if not assignmentButtons:
-        print(f'{Fore.RED}Botão de atribuição não encontrado')
-        return
-    else:
-        print(f'{Fore.GREEN}{len(assignmentButtons)} botões de atribuição encontrados:')
-        print(f'{Fore.GREEN}{[btn for btn in assignmentButtons]}')
-
-    FINISH_ASSIGN = assignmentButtons[-1]  # seleciona o último botão "Assignment"
-    FINISH_ASSIGN.click()
-    wait_loading_to_disappear()
-    finish_lead_service()
-
-
-def finish_lead_service():
-    fu_record_button = get_element(Condition.CLICKABLE, By.ID, "tab-followRecords")
-    fu_record_button.click()
+    print(f'{Fore.BLUE}Atribuindo vendedor...')
+    SAVE_BUTTON = get_last_element_by_content(By.TAG_NAME, 'button', 'Save')
+    SAVE_BUTTON.click()
