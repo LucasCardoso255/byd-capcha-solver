@@ -1,5 +1,6 @@
 import json
 import os
+from time import sleep
 from colorama import Fore
 from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER
 from selenium.webdriver.common.by import By
@@ -113,11 +114,13 @@ def append_vendor():
     print(f'{Fore.YELLOW}Atribuindo vendedor...')
 
     wait_loading_to_disappear()
+        
     input_wrapper = click_when_ready(By.XPATH, "/html/body/div[6]/div/div[2]/div/div[2]/div[1]/div/form/div/div/div[1]/div/div") # caixa de pesquisa de vendedor
 
     input_name = input_wrapper.find_element(By.TAG_NAME, "input")
     input_name.send_keys(USERNAME_GLOBAL)
     print(f'{Fore.YELLOW}Procurando vendedor: {USERNAME_GLOBAL}...')
+
     BUTTONS = get_elements(By.TAG_NAME, "button")
     
     queryButtons = [btn for btn in BUTTONS if btn.text.strip().lower() == "query"]
@@ -131,19 +134,30 @@ def append_vendor():
 
     QUERY_BUTTON = queryButtons[-1]  # seleciona o último botão "Query"
     QUERY_BUTTON.click()
+    
     print(f'{Fore.YELLOW}Clicando no botão de consulta...')
 
-
-    assign_vendor_tbody = get_element(Condition.PRESENCE, By.XPATH, "//table[contains(@class, 'el-table__body')]//tbody")
-    VENDOR_SELECT_BUTTON = assign_vendor_tbody.get_elements(By.CSS_SELECTOR, 'input.el-radio__original')
-    
-    click_when_ready(VENDOR_SELECT_BUTTON)
-    
+    wait_loading_to_disappear()
     tabs_sequence = Keys.TAB * 11
     input_name.send_keys(tabs_sequence + Keys.SPACE)
 
-    FINISH_ASSIGN = get_element(Condition.CLICKABLE,By.XPATH, '/html/body/div[12]/div/div[3]/div/button[2]')
-    FINISH_ASSIGN.click()
-        # tabs: 8
-        # e depois: 4
+    sleep(1)
 
+    assignmentButtons = [btn for btn in BUTTONS if btn.text.strip().lower() == "assignment"]
+
+    if not assignmentButtons:
+        print(f'{Fore.RED}Botão de atribuição não encontrado')
+        return
+    else:
+        print(f'{Fore.GREEN}{len(assignmentButtons)} botões de atribuição encontrados:')
+        print(f'{Fore.GREEN}{[btn for btn in assignmentButtons]}')
+
+    FINISH_ASSIGN = assignmentButtons[-1]  # seleciona o último botão "Assignment"
+    FINISH_ASSIGN.click()
+    wait_loading_to_disappear()
+    finish_lead_service()
+
+
+def finish_lead_service():
+    fu_record_button = get_element(Condition.CLICKABLE, By.ID, "tab-followRecords")
+    fu_record_button.click()
