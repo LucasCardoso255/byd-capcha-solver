@@ -1,5 +1,6 @@
 import enum
 import math
+import os
 from time import sleep, time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -20,9 +21,11 @@ class Condition(enum.Enum):
     PRESENCE = "presence"
     NO_WAIT = "no_wait"
 
-DRIVER_PATH = r"D:\.bundas\captcha2\byd-capcha-solver\Driver\webdriver.exe"
+DRIVER_PATH = '/home/lydia-server/Documentos/crawler-byd/byd-capcha-solver/Driver/geckodriver'
+DRIVER_PATH = os.path.abspath(DRIVER_PATH)
 options = Options()
-options.binary_location = r"C:\Program Files\Mozilla Firefox\firefox.exe"
+options.binary_location = "/usr/bin/firefox"
+options.add_argument("--headless") # Adicione esta linha
 DRIVER = webdriver.Firefox(service=Service(DRIVER_PATH), options=options)
     
 # espera por {cond} e pega o elemento
