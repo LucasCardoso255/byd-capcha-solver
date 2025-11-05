@@ -98,8 +98,8 @@ def get_data(coluna3: WebElement):
 def append_data():
     try:
         elemento_nome = get_element(Condition.PRESENCE, By.CSS_SELECTOR, '.use-name span')
-        nome = elemento_nome.text
-        print(f'{Fore.BLUE}Nome do lead encontrado: {nome}')
+        name = elemento_nome.text
+        print(f'{Fore.BLUE}Nome do lead encontrado: {name}')
 
         phone_element = get_element(Condition.PRESENCE, By.CSS_SELECTOR, 'div.use-base-info-item:nth-child(2) > div:nth-child(2) > span:nth-child(2)' )
         phone = int(phone_element.text)
@@ -138,7 +138,7 @@ def append_data():
             camp_id = 0
             
         body = {
-            "nome": nome,
+            "name": name,
             "phone": str(phone),
             "email": email,
             "productid": produto,
@@ -174,11 +174,11 @@ def post_data_to_api(lead):
     try:
         response = requests.post(API_URL, headers=headers, json=lead)
         if response.status_code == 201 or response.status_code == 200:
-            print(f"{Fore.GREEN}Lead enviado com sucesso: {lead['nome']}")
+            print(f"{Fore.GREEN}Lead enviado com sucesso: {lead['name']}")
         else:
-            print(f"{Fore.RED}Falha ao enviar lead: {lead['nome']}. Status Code: {response.status_code}, Response: {response.text}")
+            print(f"{Fore.RED}Falha ao enviar lead: {lead['name']}. Status Code: {response.status_code}, Response: {response.text}")
     except Exception as e:
-        print(f"{Fore.RED}Erro ao enviar lead: {lead['nome']}. Erro: {str(e)}")
+        print(f"{Fore.RED}Erro ao enviar lead: {lead['name']}. Erro: {str(e)}")
 
 
 def append_vendor():
