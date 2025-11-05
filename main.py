@@ -15,7 +15,7 @@ init(autoreset=True)
 # args = parser.parse_args()
 
 
-json_path = r'C:\.CODE\byd crawler\byd-capcha-solver\json\login.json'
+json_path = r'D:\.bundas\captcha2\byd-capcha-solver\json\login.json'
 
 # abre e carrega os dados
 with open(json_path, "r", encoding="utf-8") as f:

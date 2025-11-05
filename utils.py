@@ -20,7 +20,7 @@ class Condition(enum.Enum):
     PRESENCE = "presence"
     NO_WAIT = "no_wait"
 
-DRIVER_PATH = r"C:\.CODE\byd crawler\byd-capcha-solver\Driver\webdriver.exe"
+DRIVER_PATH = r"D:\.bundas\captcha2\byd-capcha-solver\Driver\webdriver.exe"
 options = Options()
 options.binary_location = r"C:\Program Files\Mozilla Firefox\firefox.exe"
 DRIVER = webdriver.Firefox(service=Service(DRIVER_PATH), options=options)
@@ -82,11 +82,13 @@ def click_when_ready(by, value, timeout=90):
         raise e
     
 
-def get_last_element_by_content(by, value, content):
+def get_last_element_by_content(by, value, content, first=False):
     ELEMENTS = get_elements(by, value)
     filtered_elements = [el for el in ELEMENTS if content in el.text]
     if not filtered_elements:
         raise Exception(f"Nenhum elemento encontrado com o conteúdo: {content}")
+    if first == True:
+        return filtered_elements[0] # gambiarra
     return filtered_elements[-1]
 
 def wait_until_clickable(element, timeout=20, check_interval=0.3):
