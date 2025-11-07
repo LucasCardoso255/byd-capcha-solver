@@ -83,9 +83,10 @@ def get_data(coluna3: WebElement):
     a = get_element(Condition.CLICKABLE, By.TAG_NAME, 'a', element=coluna3)
 
     if a.is_displayed():
+        url_lead = a.text
         a.click()
         print(f'{Fore.YELLOW}Lendo dados do lead...')
-        body = append_data()
+        body = append_data(url_lead)
         append_vendor()
         contact_assign()
         json_write_data(body)
@@ -95,7 +96,7 @@ def get_data(coluna3: WebElement):
         print(f'{Fore.RED}Elemento "a" não encontrado')
 
 # pegando os dados do lead e dando append na lista
-def append_data():
+def append_data(url_lead):
     try:
         elemento_nome = get_element(Condition.PRESENCE, By.CSS_SELECTOR, '.use-name span')
         name = elemento_nome.text
@@ -129,6 +130,15 @@ def append_data():
         suborigin = suborigin_element.text
         print(f'{Fore.BLUE}Suborigem encontrada: {suborigin}')
 
+        elemento_observacoes = get_element(Condition.PRESENCE, By.CSS_SELECTOR, 'div.info-content:nth-child(2)')
+        spans = elemento_observacoes.find_elements(By.TAG_NAME, "span")
+        # normaliza o texto das observacoes
+        observacoes = ", ".join(
+            s.text.strip() for s in spans if s.text.strip()
+        )
+
+        print(f'{Fore.BLUE}Observações normalizadas: {observacoes}')
+
         # Vamos pegar pelo JSON recebido futuramente porem por enquanto Hard-Coded
         if USERNAME_GLOBAL == "KaremM.Teresina":
             camp_id = 41747
@@ -144,10 +154,10 @@ def append_data():
             "productid": produto,
             "mall": mall,
             "createdAt": created_at,
-            "urllead": "",
+            "urllead": url_lead,
             "leadtype": leadtype,
             "suborigin": suborigin,
-            "details": "",
+            "details": observacoes,
             "source": 201,
             "CampaignId": camp_id,
             "people_mail": ""
