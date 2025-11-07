@@ -139,6 +139,8 @@ def append_data(url_lead):
 
         print(f'{Fore.BLUE}Observações encontradas: {observacoes}')
 
+        observacoes += f"\nURL: {url_lead}" # juntando a id com as observações, pois o Syonet não permite envio apenas da id
+
         # Vamos pegar pelo JSON recebido futuramente porem por enquanto Hard-Coded
         if USERNAME_GLOBAL == "KaremM.Teresina":
             camp_id = 41747
