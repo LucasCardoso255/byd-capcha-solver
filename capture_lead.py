@@ -2,7 +2,7 @@ import json
 import os
 import requests
 from colorama import Fore
-from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER, get_last_element_by_content, wait_until_clickable, refresh_page
+from utils import Condition, get_element, get_elements, wait_loading_to_disappear, click_when_ready,DRIVER, get_last_element_by_content, wait_until_clickable, refresh_page, normalize_text
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.keys import Keys
@@ -137,7 +137,7 @@ def append_data(url_lead):
             s.text.strip() for s in spans if s.text.strip()
         )
 
-        print(f'{Fore.BLUE}Observações normalizadas: {observacoes}')
+        print(f'{Fore.BLUE}Observações encontradas: {observacoes}')
 
         # Vamos pegar pelo JSON recebido futuramente porem por enquanto Hard-Coded
         if USERNAME_GLOBAL == "KaremM.Teresina":
@@ -157,7 +157,7 @@ def append_data(url_lead):
             "urllead": url_lead,
             "leadtype": leadtype,
             "suborigin": suborigin,
-            "details": observacoes,
+            "details": normalize_text(observacoes),
             "source": 201,
             "CampaignId": camp_id,
             "people_mail": ""

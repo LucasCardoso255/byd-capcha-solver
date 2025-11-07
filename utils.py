@@ -1,6 +1,7 @@
 import enum
 import math
 import os
+import unicodedata
 from time import sleep, time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -157,3 +158,9 @@ def refresh_page():
 
 def wait_page_ready():
     WebDriverWait(DRIVER, 30).until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+
+def normalize_text(text: str) -> str:
+    """
+        Função para normalizar o ' : ' desse site chines safado que usa caracteres fora do padrão.  
+    """
+    return text.replace("：", ":").strip() 
